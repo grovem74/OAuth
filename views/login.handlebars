@@ -1,0 +1,26 @@
+<h1>Be Green</h1>
+
+{{#if messages.error}}
+{{messages.error}}
+{{/if}}
+
+<h3>Sign in with username/password:</h3>
+<form action="/login" method="POST">
+    <div>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" required>
+    </div>
+    <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+    </div><br>
+    <button type="submit">Login</button>  <a href="/register">Register</a>
+</form>
+<br>
+<h3>Sign in with:</h3>
+<a class="google-btn" href="/auth/google">GOOGLE</a>
+<a class="facebook-btn" href="/auth/facebook">FACEBOOK</a>
+
+{{!-- <form action="/logout?_method=DELETE" method="POST">
+<button type="submit">Log Out</button>
+</form> --}}
