@@ -1,8 +1,10 @@
 const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
+const TwitterStrategy = require("passport-twitter").Strategy;
 const bcrypt = require("bcrypt");
 
-function initialize(passport, getUserByEmail, getUserById) {
+function initialize(passport, getUserByEmail) {
     const authenticateUser = async (email, password, done) => {
         const user = getUserByEmail(email)
         if (user == null) {
@@ -21,41 +23,43 @@ function initialize(passport, getUserByEmail, getUserById) {
     }
     passport.use(new LocalStrategy({ usernameField: "email" },
         authenticateUser))
-        
+
     passport.serializeUser((user, done) => done(null, user.id))
     passport.deserializeUser((id, done) => {
-        return done(null, getUserById(id))
+        return done(null, false)
     })
 
     passport.use(new GoogleStrategy({
-        callbackURL: "/auth/google/cb",
-        clientID: process.env.clientID,
-        clientSecret: process.env.clientSecret,
-        // passReqToCallback: true
+        callbackURL: "http://localhost:8080/auth/google/cb",
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }, (accessToken, refreshToken, profile, done) => {
-        // passport callback function
-        console.log('passport callback function fired:');
-        // return console.log(profile);
-        return (console.log(profile));
+        console.log('passport Google callback function fired:');
+        return done(null, console.log(profile));
+    }
+    ));
 
-    })
-    );
+    passport.use(new FacebookStrategy({
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        callbackURL: "http://localhost:8080/auth/facebook/cb"
+    },
+        function (accessToken, refreshToken, profile, done) {
+            console.log('passport Facebook callback function fired:');
+            return done(null, console.log(profile));
+        }
+    ));
 
-
-    // passport.use(new GoogleStrategy({
-    //     clientID:     process.env.clientID,
-    //     clientSecret: process.env.clientSecret,
-    //     callbackURL: "http://localhost:8080/auth/google/cb",
-    //     passReqToCallback   : true
-    //   },
-    //   function(request, accessToken, refreshToken, profile, done) {
-    //     User.findOrCreate({ googleId: profile.id }, function (err, user) {
-    //       return done(err, user);
-    //     });
-    //   }
-    // ));
-
-
+    passport.use(new TwitterStrategy({
+        consumerKey: process.env.TWITTER_API_KEY,
+        consumerSecret: process.env.TWITTER_API_SECRET_KEY,
+        callbackURL: "http://localhost:8080/auth/twitter/cb"
+    },
+        function (token, tokenSecret, profile, done) {
+            console.log('passport Twitter callback function fired:');
+            return done(null, console.log(profile));
+        }
+    ));
 
 };
 

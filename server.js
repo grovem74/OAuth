@@ -11,7 +11,7 @@ const app = express();
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
-const methodOverride = require('method-override')
+const methodOverride = require("method-override")
 const bcrypt = require("bcrypt");
 
 const initializePassport = require("./config/passport-config");
@@ -53,7 +53,7 @@ app.get("/register", checkNotAuthenticated, (req, res) => {
 });
 
 app.post("/login", checkNotAuthenticated, passport.authenticate("local", {
-    successRedirect: "/",
+    successRedirect: "/success",
     failureRedirect: "/login",
     failureFlash: true
 }));
@@ -82,22 +82,53 @@ app.delete("/logout", (req, res) => {
 
 // auth routes
 
-   // authenticate with Google
-app.get('/auth/google', passport.authenticate('google', {
-    scope: ['profile']
+// authenticate with Google
+app.get("/auth/google", passport.authenticate("google", {
+    scope: ["profile"]
 }));
 
+app.get("/auth/google/cb",
+    passport.authenticate("google", {
+        successRedirect: "/success",
+        failureRedirect: "/"
+    }));
 
-// app.get('/auth/google/cb', 
-//     passport.authenticate( 'google', { 
-//         successRedirect: '/auth/google/success',
-//         failureRedirect: '/auth/google/failure'
-// }));
+// authenticate with Facebook
+app.get("/auth/facebook", passport.authenticate("facebook", {
+}));
 
-app.get('/auth/google/cb', passport.authenticate('google'), (req, res) => {
-    // res.send(req.user);
-    // res.redirect('/profile');
-    ciosole.log("cb request");
+app.get("/auth/facebook/cb",
+    passport.authenticate("facebook", {
+        successRedirect: "/success",
+        failureRedirect: "/"
+    }));
+
+// authenticate with Twitter
+app.get("/auth/twitter", passport.authenticate("twitter", {
+}));
+
+app.get("/auth/twitter/cb",
+    passport.authenticate("twitter", {
+        successRedirect: "/success",
+        failureRedirect: "/"
+    }));
+
+
+
+// app.get('/auth/facebook/cb',
+//     passport.authenticate('facebook', { failureRedirect: '/login' }),
+//     function (req, res) {
+//         // Successful authentication, redirect home.
+//         res.redirect('/');
+//     });
+
+
+
+
+
+
+app.get("/success", checkNotAuthenticated, (req, res) => {
+    res.render("success")
 });
 
 app.delete("/auth/logout", (req, res) => {
